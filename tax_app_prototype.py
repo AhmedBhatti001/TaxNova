@@ -2,29 +2,81 @@ import streamlit as st
 import requests
 import matplotlib.pyplot as plt
 
+# Set custom theme styles using markdown and container formatting
+st.markdown(
+    """
+    <style>
+    .income-box {
+        border: 2px solid #4CAF50;
+        border-radius: 10px;
+        background-color: #f9f9f9;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    .note {
+        font-size: 14px;
+        color: #555;
+    }
+    .header {
+        color: #4CAF50;
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Title and Introduction
-st.markdown("# 🏦 TaxNova: Tax Assessment and Guidance App")
+st.markdown('<h1 class="header">🏦 TaxNova: Tax Assessment and Guidance App</h1>', unsafe_allow_html=True)
 st.write("This app provides an enhanced tax calculation and allows users to provide feedback for continuous improvement.")
 
+# Add a note
+st.markdown('<p class="note">*Please enter your yearly income in the fields below.</p>', unsafe_allow_html=True)
+
 # Input Form
-st.header("📄 Enter Your Income Details")
+st.markdown('<h2 class="header">📄 Enter Your Income Details</h2>', unsafe_allow_html=True)
 
 # Variables for calculations
-salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-business_income = st.number_input("Enter Business Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Capital Gains
-st.subheader("Income from Capital Gains")
-capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+st.markdown('<h3 class="header">Income from Capital Gains</h3>', unsafe_allow_html=True)
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Other Sources
-st.subheader("Other Sources")
-sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+st.markdown('<h3 class="header">Other Sources</h3>', unsafe_allow_html=True)
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="income-box">', unsafe_allow_html=True)
+profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0, value=0, step=1000)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # Tax Calculation
 if st.button("📊 Calculate Tax"):
@@ -116,7 +168,7 @@ if st.button("📊 Calculate Tax"):
     }
 
     fig, ax = plt.subplots()
-    ax.bar(breakdown_data.keys(), breakdown_data.values())
+    ax.bar(breakdown_data.keys(), breakdown_data.values(), color="#4CAF50")
     ax.set_title("Income Breakdown")
     ax.set_ylabel("Amount (PKR)")
     st.pyplot(fig)
