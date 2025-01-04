@@ -9,49 +9,22 @@ st.write("This app provides an enhanced tax calculation and allows users to prov
 # Input Form
 st.header("📄 Enter Your Income Details")
 
-# Dropdown menus for main headings
-income_type = st.selectbox("Select Income Type:", [
-    "Income from Salary",
-    "Income from Business",
-    "Foreign Income",
-    "Income from Capital Gains",
-    "Other Sources"
-])
-
 # Variables for calculations
-salary_income = 0
-business_income = 0
-foreign_income = 0
-capital_gains_securities = 0
-capital_gains_property = 0
-sukuk_income = 0
-dividend_income = 0
-prizes_winnings = 0
-profit_on_debt = 0
+salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+business_income = st.number_input("Enter Business Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
 
-# Based on the selected type, show relevant inputs
-if income_type == "Income from Salary":
-    salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-elif income_type == "Income from Business":
-    business_income = st.number_input("Enter Business Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-elif income_type == "Foreign Income":
-    foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-elif income_type == "Income from Capital Gains":
-    capital_type = st.selectbox("Select Capital Gain Type:", ["Securities", "Properties"])
-    if capital_type == "Securities":
-        capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-    else:
-        capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-elif income_type == "Other Sources":
-    other_source_type = st.selectbox("Select Other Source Type:", ["Sukuk Investments", "Dividend Income", "Prizes and Winnings", "Profit on Debt"])
-    if other_source_type == "Sukuk Investments":
-        sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-    elif other_source_type == "Dividend Income":
-        dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-    elif other_source_type == "Prizes and Winnings":
-        prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-    elif other_source_type == "Profit on Debt":
-        profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+# Capital Gains
+st.subheader("Income from Capital Gains")
+capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Other Sources
+st.subheader("Other Sources")
+sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
 
 # Tax Calculation
 if st.button("📊 Calculate Tax"):
