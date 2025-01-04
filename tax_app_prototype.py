@@ -126,7 +126,10 @@ st.header("📝 Feedback")
 feedback = st.text_area("Is anything missing or needed to calculate? Provide your feedback below:")
 if st.button("Submit Feedback"):
     if feedback:
-        st.success("Thank you for your feedback! We will use it to improve the system.")
+        # Log feedback to a file
+        with open("feedback_log.txt", "a") as file:
+            file.write(f"{feedback}\n")
+        st.success("Thank you for your feedback! It has been saved for review.")
     else:
         st.warning("Please enter feedback before submitting.")
 
