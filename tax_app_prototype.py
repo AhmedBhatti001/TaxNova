@@ -9,60 +9,58 @@ st.write("This app provides an enhanced tax calculation and allows users to prov
 # Input Form
 st.header("📄 Enter Your Income Details")
 
-# Organize Inputs into Columns
-col1, col2 = st.columns(2)
-with col1:
-    st.subheader("💰 Salary Income")
+# Dropdown menus for main headings
+income_type = st.selectbox("Select Income Type:", [
+    "Income from Salary",
+    "Income from Business",
+    "Foreign Income",
+    "Income from Capital Gains",
+    "Other Sources"
+])
+
+# Variables for calculations
+salary_income = 0
+business_income = 0
+foreign_income = 0
+capital_gains_securities = 0
+capital_gains_property = 0
+sukuk_income = 0
+dividend_income = 0
+prizes_winnings = 0
+profit_on_debt = 0
+
+# Based on the selected type, show relevant inputs
+if income_type == "Income from Salary":
     salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-    st.subheader("📈 Dividend Income")
-    dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-    st.subheader("💵 Profit on Debt")
-    profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-with col2:
-    st.subheader("📊 Sukuk Investments")
-    sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-    st.subheader("🏠 Income from Property")
-    property_income = st.number_input("Enter Property Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-    st.subheader("🎉 Prizes and Winnings")
-    prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-
-# Custom Income Sources
-st.subheader("➕ Add Custom Income Sources")
-custom_sources = []
-custom_income = st.text_input("Custom Income Source Name:")
-custom_amount = st.number_input("Amount (in PKR) for Custom Source:", min_value=0.0, value=0.0, step=1000.0)
-custom_tax_rate = st.number_input("Tax Rate (%) for Custom Source:", min_value=0.0, value=0.0, step=1.0)
-
-if st.button("Add Custom Source"):
-    if custom_income and custom_amount > 0 and custom_tax_rate > 0:
-        custom_sources.append({"source": custom_income, "amount": custom_amount, "tax_rate": custom_tax_rate})
-        st.success(f"Added {custom_income} with amount {custom_amount} PKR and tax rate {custom_tax_rate}%.")
-
-# Display Added Custom Sources
-if custom_sources:
-    st.write("### Custom Income Sources")
-    for idx, source in enumerate(custom_sources):
-        st.write(f"{idx+1}. {source['source']} - Amount: PKR {source['amount']}, Tax Rate: {source['tax_rate']}%")
+elif income_type == "Income from Business":
+    business_income = st.number_input("Enter Business Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+elif income_type == "Foreign Income":
+    foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+elif income_type == "Income from Capital Gains":
+    capital_type = st.selectbox("Select Capital Gain Type:", ["Securities", "Properties"])
+    if capital_type == "Securities":
+        capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+    else:
+        capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+elif income_type == "Other Sources":
+    other_source_type = st.selectbox("Select Other Source Type:", ["Sukuk Investments", "Dividend Income", "Prizes and Winnings", "Profit on Debt"])
+    if other_source_type == "Sukuk Investments":
+        sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+    elif other_source_type == "Dividend Income":
+        dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+    elif other_source_type == "Prizes and Winnings":
+        prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+    elif other_source_type == "Profit on Debt":
+        profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
 
 # Tax Calculation
 if st.button("📊 Calculate Tax"):
     total_income = (
-        salary_income + dividend_income + profit_on_debt + sukuk_income + 
-        property_income + prizes_winnings
+        salary_income + business_income + foreign_income + 
+        capital_gains_securities + capital_gains_property + sukuk_income +
+        dividend_income + prizes_winnings + profit_on_debt
     )
-    total_custom_tax = 0
-
-    for source in custom_sources:
-        total_income += source['amount']
-        total_custom_tax += (source['amount'] * source['tax_rate'] / 100)
-
-    taxable_income = max(total_income, 0)
-    tax = total_custom_tax
+    tax = 0
     tax_breakdown = []
 
     # Salary Income Slabs
@@ -85,39 +83,52 @@ if st.button("📊 Calculate Tax"):
             tax += 700000 + (salary_income - 4100000) * 0.35
             tax_breakdown.append(f"Salary Income: PKR 700,000 + 35% on PKR {salary_income - 4100000}")
 
-    # Dividend Income
-    if dividend_income > 0:
-        tax += dividend_income * 0.15
-        tax_breakdown.append(f"Dividend Income: 15% on PKR {dividend_income}")
+    # Business Income Slabs
+    if business_income > 0:
+        if business_income <= 600000:
+            tax_breakdown.append("Business Income: Tax-Free")
+        elif business_income <= 1200000:
+            tax += (business_income - 600000) * 0.05
+            tax_breakdown.append(f"Business Income: 5% on PKR {business_income - 600000}")
+        elif business_income <= 2200000:
+            tax += 30000 + (business_income - 1200000) * 0.15
+            tax_breakdown.append(f"Business Income: PKR 30,000 + 15% on PKR {business_income - 1200000}")
+        elif business_income <= 3200000:
+            tax += 180000 + (business_income - 2200000) * 0.25
+            tax_breakdown.append(f"Business Income: PKR 180,000 + 25% on PKR {business_income - 2200000}")
+        elif business_income <= 4100000:
+            tax += 430000 + (business_income - 3200000) * 0.3
+            tax_breakdown.append(f"Business Income: PKR 430,000 + 30% on PKR {business_income - 3200000}")
+        else:
+            tax += 700000 + (business_income - 4100000) * 0.35
+            tax_breakdown.append(f"Business Income: PKR 700,000 + 35% on PKR {business_income - 4100000}")
 
-    # Profit on Debt
-    if profit_on_debt > 0:
-        tax += profit_on_debt * 0.15
-        tax_breakdown.append(f"Profit on Debt: 15% on PKR {profit_on_debt}")
+    # Foreign Income Tax
+    if foreign_income > 0:
+        tax += foreign_income * 0.01
+        tax_breakdown.append(f"Foreign Income: 1% on PKR {foreign_income}")
 
-    # Sukuk Investments
+    # Capital Gains Tax
+    if capital_gains_securities > 0:
+        tax += capital_gains_securities * 0.125
+        tax_breakdown.append(f"Capital Gains (Securities): 12.5% on PKR {capital_gains_securities}")
+    if capital_gains_property > 0:
+        tax += capital_gains_property * 0.15
+        tax_breakdown.append(f"Capital Gains (Properties): 15% on PKR {capital_gains_property}")
+
+    # Other Sources Tax
     if sukuk_income > 0:
         tax += sukuk_income * 0.1
         tax_breakdown.append(f"Sukuk Income: 10% on PKR {sukuk_income}")
-
-    # Property Income
-    if property_income > 0:
-        if property_income <= 300000:
-            tax_breakdown.append("Property Income: Tax-Free")
-        elif property_income <= 600000:
-            tax += (property_income - 300000) * 0.05
-            tax_breakdown.append(f"Property Income: 5% on PKR {property_income - 300000}")
-        elif property_income <= 2000000:
-            tax += 15000 + (property_income - 600000) * 0.1
-            tax_breakdown.append(f"Property Income: PKR 15,000 + 10% on PKR {property_income - 600000}")
-        else:
-            tax += 155000 + (property_income - 2000000) * 0.25
-            tax_breakdown.append(f"Property Income: PKR 155,000 + 25% on PKR {property_income - 2000000}")
-
-    # Prizes and Winnings
+    if dividend_income > 0:
+        tax += dividend_income * 0.15
+        tax_breakdown.append(f"Dividend Income: 15% on PKR {dividend_income}")
     if prizes_winnings > 0:
         tax += prizes_winnings * 0.2
         tax_breakdown.append(f"Prizes and Winnings: 20% on PKR {prizes_winnings}")
+    if profit_on_debt > 0:
+        tax += profit_on_debt * 0.15
+        tax_breakdown.append(f"Profit on Debt: 15% on PKR {profit_on_debt}")
 
     # Display Results
     st.success(f"Your total income: PKR {total_income}")
@@ -125,9 +136,10 @@ if st.button("📊 Calculate Tax"):
 
     # Visualize Tax Breakdown
     breakdown_data = {
-        "Salary": salary_income, "Dividend": dividend_income,
-        "Debt": profit_on_debt, "Sukuk": sukuk_income,
-        "Property": property_income, "Winnings": prizes_winnings
+        "Salary": salary_income, "Business": business_income, "Foreign": foreign_income,
+        "Cap. Gains (Securities)": capital_gains_securities, "Cap. Gains (Properties)": capital_gains_property,
+        "Sukuk": sukuk_income, "Dividend": dividend_income, "Prizes": prizes_winnings,
+        "Debt": profit_on_debt
     }
 
     fig, ax = plt.subplots()
