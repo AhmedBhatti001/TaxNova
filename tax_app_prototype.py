@@ -3,65 +3,150 @@ import requests
 
 # Title and Introduction
 st.title("TaxNova: Tax Assessment and Guidance App")
-st.write("This app provides an enhanced tax calculation and AI-driven Q&A for tax-related queries.")
+st.write("This app provides an enhanced tax calculation and allows users to provide feedback for continuous improvement.")
 
 # Input Form
 st.header("Enter Your Income Details")
-salary_income = st.number_input("Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-business_income = st.number_input("Business Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
-exemptions = st.number_input("Exemptions (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Salary Income
+st.subheader("Salary Income")
+salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Dividend Income
+st.subheader("Dividend Income")
+dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Profit on Debt
+st.subheader("Profit on Debt")
+profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Sukuk Investments
+st.subheader("Sukuk Investments")
+sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Property Income
+st.subheader("Income from Property")
+property_income = st.number_input("Enter Property Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Prizes and Winnings
+st.subheader("Prizes and Winnings")
+prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Brokerage and Commission
+st.subheader("Brokerage & Commission")
+brokerage_commission = st.number_input("Enter Brokerage & Commission Income (in PKR):", min_value=0.0, value=0.0, step=1000.0)
+
+# Custom Income Sources
+st.subheader("Add Custom Income Sources")
+custom_sources = []
+custom_income = st.text_input("Custom Income Source Name:")
+custom_amount = st.number_input("Amount (in PKR) for Custom Source:", min_value=0.0, value=0.0, step=1000.0)
+custom_tax_rate = st.number_input("Tax Rate (%) for Custom Source:", min_value=0.0, value=0.0, step=1.0)
+
+if st.button("Add Custom Source"):
+    if custom_income and custom_amount > 0 and custom_tax_rate > 0:
+        custom_sources.append({"source": custom_income, "amount": custom_amount, "tax_rate": custom_tax_rate})
+        st.success(f"Added {custom_income} with amount {custom_amount} PKR and tax rate {custom_tax_rate}%.")
+
+# Display Added Custom Sources
+if custom_sources:
+    st.write("### Custom Income Sources")
+    for idx, source in enumerate(custom_sources):
+        st.write(f"{idx+1}. {source['source']} - Amount: PKR {source['amount']}, Tax Rate: {source['tax_rate']}%")
 
 if st.button("Calculate Tax"):
-    # Enhanced Tax Calculation Logic
-    total_income = salary_income + business_income
-    taxable_income = max(total_income - exemptions, 0)
-    tax = 0
-    tax_breakdown = ""
+    # Tax Calculation Logic
+    total_income = (
+        salary_income + dividend_income + profit_on_debt + sukuk_income + 
+        property_income + prizes_winnings + brokerage_commission
+    )
+    total_custom_tax = 0
 
-    if taxable_income <= 600000:
-        tax = 0
-        tax_breakdown = "Income below PKR 600,000 is tax-free."
-    elif taxable_income <= 1200000:
-        tax = (taxable_income - 600000) * 0.05
-        tax_breakdown = f"5% tax on income above PKR 600,000: PKR {tax}."
-    elif taxable_income <= 2400000:
-        tax = 30000 + (taxable_income - 1200000) * 0.1
-        tax_breakdown = ("PKR 30,000 for the first PKR 1,200,000 plus 10% on income "
-                         f"above PKR 1,200,000: PKR {tax - 30000}.")
-    else:
-        tax = 150000 + (taxable_income - 2400000) * 0.2
-        tax_breakdown = ("PKR 150,000 for the first PKR 2,400,000 plus 20% on income "
-                         f"above PKR 2,400,000: PKR {tax - 150000}.")
+    # Calculate Tax for Custom Sources
+    for source in custom_sources:
+        total_income += source['amount']
+        total_custom_tax += (source['amount'] * source['tax_rate'] / 100)
 
+    taxable_income = max(total_income, 0)
+    tax = total_custom_tax
+    tax_breakdown = []
+
+    # Tax Slabs and Rules
+    # Salary Income Slabs
+    if salary_income > 0:
+        if salary_income <= 600000:
+            tax_breakdown.append("Salary Income: Tax-Free")
+        elif salary_income <= 1200000:
+            tax += (salary_income - 600000) * 0.05
+            tax_breakdown.append(f"Salary Income: 5% on PKR {salary_income - 600000}")
+        elif salary_income <= 2200000:
+            tax += 30000 + (salary_income - 1200000) * 0.15
+            tax_breakdown.append(f"Salary Income: PKR 30,000 + 15% on PKR {salary_income - 1200000}")
+        elif salary_income <= 3200000:
+            tax += 180000 + (salary_income - 2200000) * 0.25
+            tax_breakdown.append(f"Salary Income: PKR 180,000 + 25% on PKR {salary_income - 2200000}")
+        elif salary_income <= 4100000:
+            tax += 430000 + (salary_income - 3200000) * 0.3
+            tax_breakdown.append(f"Salary Income: PKR 430,000 + 30% on PKR {salary_income - 3200000}")
+        else:
+            tax += 700000 + (salary_income - 4100000) * 0.35
+            tax_breakdown.append(f"Salary Income: PKR 700,000 + 35% on PKR {salary_income - 4100000}")
+
+    # Dividend Income Rules
+    if dividend_income > 0:
+        tax += dividend_income * 0.15
+        tax_breakdown.append(f"Dividend Income: 15% on PKR {dividend_income}")
+
+    # Profit on Debt Rules
+    if profit_on_debt > 0:
+        tax += profit_on_debt * 0.15
+        tax_breakdown.append(f"Profit on Debt: 15% on PKR {profit_on_debt}")
+
+    # Sukuk Investments Rules
+    if sukuk_income > 0:
+        tax += sukuk_income * 0.1
+        tax_breakdown.append(f"Sukuk Income: 10% on PKR {sukuk_income}")
+
+    # Property Income Rules
+    if property_income > 0:
+        if property_income <= 300000:
+            tax_breakdown.append("Property Income: Tax-Free")
+        elif property_income <= 600000:
+            tax += (property_income - 300000) * 0.05
+            tax_breakdown.append(f"Property Income: 5% on PKR {property_income - 300000}")
+        elif property_income <= 2000000:
+            tax += 15000 + (property_income - 600000) * 0.1
+            tax_breakdown.append(f"Property Income: PKR 15,000 + 10% on PKR {property_income - 600000}")
+        else:
+            tax += 155000 + (property_income - 2000000) * 0.25
+            tax_breakdown.append(f"Property Income: PKR 155,000 + 25% on PKR {property_income - 2000000}")
+
+    # Prizes and Winnings Rules
+    if prizes_winnings > 0:
+        tax += prizes_winnings * 0.2
+        tax_breakdown.append(f"Prizes and Winnings: 20% on PKR {prizes_winnings}")
+
+    # Brokerage and Commission Rules
+    if brokerage_commission > 0:
+        tax += brokerage_commission * 0.1
+        tax_breakdown.append(f"Brokerage and Commission: 10% on PKR {brokerage_commission}")
+
+    # Display Results
     st.write(f"Your total income: PKR {total_income}")
-    st.write(f"Your taxable income: PKR {taxable_income}")
     st.write(f"Your estimated tax: PKR {tax}")
-    st.write("Breakdown:", tax_breakdown)
+    st.write("Breakdown:")
+    for line in tax_breakdown:
+        st.write(f"- {line}")
 
-# Display Tax Slabs
-st.header("Tax Slabs")
-st.table([
-    {"Income Range": "Up to PKR 600,000", "Tax Rate": "0%"},
-    {"Income Range": "PKR 600,001 - 1,200,000", "Tax Rate": "5%"},
-    {"Income Range": "PKR 1,200,001 - 2,400,000", "Tax Rate": "10%"},
-    {"Income Range": "Above PKR 2,400,000", "Tax Rate": "20%"},
-])
-
-# Q&A Section
-st.header("Ask AI About Taxes")
-user_query = st.text_input("Enter your tax-related question:")
-if st.button("Get Answer"):
-    # Call Hugging Face API (replace with your API details)
-    API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased"
-    headers = {"Authorization": "Bearer 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"}
-    payload = {"inputs": user_query}
-
-    try:
-        response = requests.post(API_URL, headers=headers, json=payload)
-        result = response.json()
-        st.write("Answer:", result.get('generated_text', 'Sorry, no answer available.'))
-    except Exception as e:
-        st.write("Error connecting to AI service:", e)
+# Feedback Section
+st.header("Feedback")
+feedback = st.text_area("Is anything missing or needed to calculate? Provide your feedback below:")
+if st.button("Submit Feedback"):
+    if feedback:
+        # Here, the feedback could be logged to a database or sent via email
+        st.success("Thank you for your feedback! We will use it to improve the system.")
+    else:
+        st.warning("Please enter feedback before submitting.")
 
 # Placeholder for Future Additions
 st.sidebar.title("Future Additions")
