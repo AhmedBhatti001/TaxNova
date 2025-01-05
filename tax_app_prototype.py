@@ -52,9 +52,51 @@ def hierarchical_menu():
             ])
             for selection in selected_salary:
                 value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_income")
-                if st.button(f"Add {selection}"):
+                if st.button(f"Add {selection}", key=f"add_{selection}"):
                     st.session_state["selected_items"]["Income Sources"].append((selection, value))
-        # Repeat similar logic for other subcategories (e.g., Income from Business, Property, etc.)
+        elif income_main_categories == "Income from Business":
+            selected_business = st.multiselect("Select Business Income Type:", [
+                "Sole Proprietorship Income", "Partnership Income", "Corporate Business Income", 
+                "Profits from Manufacturing"
+            ])
+            for selection in selected_business:
+                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_business")
+                if st.button(f"Add {selection}", key=f"add_{selection}_business"):
+                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+        elif income_main_categories == "Income from Property":
+            selected_property = st.multiselect("Select Property Income Type:", [
+                "Rental Income from Residential Properties", "Rental Income from Commercial Properties", 
+                "Leasing Income", "Subletting Income"
+            ])
+            for selection in selected_property:
+                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_property")
+                if st.button(f"Add {selection}", key=f"add_{selection}_property"):
+                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+        elif income_main_categories == "Capital Gains":
+            selected_gains = st.multiselect("Select Capital Gains Type:", [
+                "Gains on Sale of Real Estate", "Gains on Sale of Stocks", "Gains on Sale of Bonds"
+            ])
+            for selection in selected_gains:
+                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_gains")
+                if st.button(f"Add {selection}", key=f"add_{selection}_gains"):
+                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+        elif income_main_categories == "Income from Other Sources":
+            selected_others = st.multiselect("Select Other Income Type:", [
+                "Interest Income", "Dividend Income", "Royalty Income", "Prize Money"
+            ])
+            for selection in selected_others:
+                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_others")
+                if st.button(f"Add {selection}", key=f"add_{selection}_others"):
+                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+        elif income_main_categories == "Foreign Income":
+            selected_foreign = st.multiselect("Select Foreign Income Type:", [
+                "Salaries Earned Abroad", "Business Income from Foreign Operations", 
+                "Dividends and Interest Earned Overseas", "Foreign Rental Income"
+            ])
+            for selection in selected_foreign:
+                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_foreign")
+                if st.button(f"Add {selection}", key=f"add_{selection}_foreign"):
+                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
 
     elif selected_main_category == "Deductions":
         selected_deduction = st.multiselect("Select Deductions:", [
@@ -69,7 +111,7 @@ def hierarchical_menu():
         for selection in selected_deduction:
             if selection != "Custom Input":
                 value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_deduction")
-                if st.button(f"Add {selection}"):
+                if st.button(f"Add {selection}", key=f"add_{selection}_deduction"):
                     st.session_state["selected_items"]["Deductions"].append((selection, value))
 
     elif selected_main_category == "Tax Credits":
@@ -86,8 +128,20 @@ def hierarchical_menu():
         for selection in selected_credit:
             if selection != "Custom Input":
                 value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_credit")
-                if st.button(f"Add {selection}"):
+                if st.button(f"Add {selection}", key=f"add_{selection}_credit"):
                     st.session_state["selected_items"]["Tax Credits"].append((selection, value))
+
+# Calculate taxes
+def calculate_tax():
+    total_income = sum(value for _, value in st.session_state["selected_items"]["Income Sources"])
+    total_deductions = sum(value for _, value in st.session_state["selected_items"]["Deductions"])
+    total_credits = sum(value for _, value in st.session_state["selected_items"]["Tax Credits"])
+
+    taxable_income = max(total_income - total_deductions, 0)
+    tax_payable_before_credits = taxable_income * 0.10  # Example flat tax rate
+    final_tax = max(tax_payable_before_credits - total_credits, 0)
+
+    return total_income, total_deductions, total_credits, taxable_income, final_tax
 
 # Main function
 def main():
@@ -111,7 +165,14 @@ def main():
         st.write(f"- {item}: PKR {value}")
 
     if st.button("📊 Calculate Tax"):
-        st.success("Tax calculation logic to be implemented.")
+        total_income, total_deductions, total_credits, taxable_income, final_tax = calculate_tax()
+
+        st.markdown('<h2 class="header">Tax Calculation Summary</h2>', unsafe_allow_html=True)
+        st.write(f"**Total Income:** PKR {total_income}")
+        st.write(f"**Total Deductions:** PKR {total_deductions}")
+        st.write(f"**Total Tax Credits:** PKR {total_credits}")
+        st.write(f"**Taxable Income:** PKR {taxable_income}")
+        st.write(f"**Final Tax Payable:** PKR {final_tax}")
 
 if __name__ == "__main__":
     main()
