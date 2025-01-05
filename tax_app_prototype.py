@@ -54,6 +54,28 @@ def calculate_salary_tax(income):
             previous_limit = slabs[slabs.index(slab) - 1]["limit"] if slabs.index(slab) > 0 else 0
             return slab.get("base_tax", 0) + (income - previous_limit) * slab["rate"]
 
+# Function to calculate tax payable
+def calculate_tax_payable():
+    total_income = sum([value for _, value, _ in st.session_state["selected_items"]["Income Sources"]])
+    total_deductions = sum([value for _, value in st.session_state["selected_items"]["Deductions"]])
+    total_credits = sum([value for _, value in st.session_state["selected_items"]["Tax Credits"]])
+
+    # Apply tax slabs for taxable income
+    taxable_income = total_income - total_deductions
+    if taxable_income < 0:
+        taxable_income = 0
+
+    tax_payable = 0
+    for _, value, tax in st.session_state["selected_items"]["Income Sources"]:
+        tax_payable += tax
+
+    # Apply tax credits
+    tax_payable -= total_credits
+    if tax_payable < 0:
+        tax_payable = 0
+
+    return total_income, total_deductions, total_credits, taxable_income, tax_payable
+
 # Function to dynamically handle income source selections
 def handle_income_sources():
     income_main_categories = st.selectbox("Select Income Type:", [
@@ -169,6 +191,20 @@ def reset_calculations():
         }
         st.success("All calculations have been reset.")
 
+# Add the calculate button
+def add_calculate_button():
+    if st.button("📊 Calculate Tax Payable"):
+        total_income, total_deductions, total_credits, taxable_income, tax_payable = calculate_tax_payable()
+        
+        # Display results
+        st.markdown("### 📋 Tax Summary:")
+        st.write(f"**Total Income:** PKR {total_income}")
+        st.write(f"**Total Deductions:** PKR {total_deductions}")
+        st.write(f"**Total Tax Credits:** PKR {total_credits}")
+        st.write(f"**Taxable Income:** PKR {taxable_income}")
+        st.write(f"**Tax Payable:** PKR {tax_payable}")
+        st.success("Calculation completed successfully!")
+
 # Main function
 def main():
     set_styles()
@@ -185,6 +221,7 @@ def main():
         handle_tax_credits()
 
     display_selected_items()
+    add_calculate_button()  # Add the calculate button
     reset_calculations()
 
 if __name__ == "__main__":
