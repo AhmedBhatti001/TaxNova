@@ -164,7 +164,7 @@ def reset_calculations():
 # Main function
 def main():
     set_styles()
-    st.markdown('<h1 class="header">🏦 TaxNova: Comprehensive Tax App</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="header">🏦 TaxNova: Tax assessment app prototype</h1>', unsafe_allow_html=True)
     st.write("This app calculates your taxes with a detailed breakdown of income sources, deductions, and tax credits.")
 
     selected_main_category = st.selectbox("Select Main Category:", ["Income Sources", "Deductions", "Tax Credits"])
