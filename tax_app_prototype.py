@@ -37,123 +37,101 @@ st.markdown('<p class="note">*Please enter your yearly income in the fields belo
 # Input Form
 st.markdown('<h2 class="header">📄 Enter Your Income Details</h2>', unsafe_allow_html=True)
 
-# Variables for calculations
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Salary Income Subcategories
+st.markdown('<h3 class="header">Income from Salary</h3>', unsafe_allow_html=True)
+salary_income = st.number_input("Salary (in PKR):", min_value=0, value=0, step=1000)
+bonuses_commissions = st.number_input("Bonuses and Commissions (in PKR):", min_value=0, value=0, step=1000)
+gratuity = st.number_input("Gratuity (in PKR):", min_value=0, value=0, step=1000)
+leave_encashment = st.number_input("Leave Encashment (in PKR):", min_value=0, value=0, step=1000)
+perquisites = st.number_input("Perquisites (e.g., car allowances, housing) (in PKR):", min_value=0, value=0, step=1000)
+benefits_in_kind = st.number_input("Benefits in Kind (in PKR):", min_value=0, value=0, step=1000)
 
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Business Income Subcategories
+st.markdown('<h3 class="header">Income from Business</h3>', unsafe_allow_html=True)
+sole_proprietorship = st.number_input("Sole Proprietorship Income (in PKR):", min_value=0, value=0, step=1000)
+partnership_income = st.number_input("Partnership Income (in PKR):", min_value=0, value=0, step=1000)
+corporate_income = st.number_input("Corporate Business Income (in PKR):", min_value=0, value=0, step=1000)
+manufacturing_income = st.number_input("Profits from Manufacturing, Trading, and Services (in PKR):", min_value=0, value=0, step=1000)
+agricultural_income = st.number_input("Agricultural Business Income (in PKR):", min_value=0, value=0, step=1000)
+professional_services = st.number_input("Professional Services (e.g., consultancy, freelancing) (in PKR):", min_value=0, value=0, step=1000)
 
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Property Income Subcategories
+st.markdown('<h3 class="header">Income from Property</h3>', unsafe_allow_html=True)
+rental_residential = st.number_input("Rental Income from Residential Properties (in PKR):", min_value=0, value=0, step=1000)
+rental_commercial = st.number_input("Rental Income from Commercial Properties (in PKR):", min_value=0, value=0, step=1000)
+leasing_income = st.number_input("Leasing Income (in PKR):", min_value=0, value=0, step=1000)
+subletting_income = st.number_input("Subletting Income (in PKR):", min_value=0, value=0, step=1000)
 
-# Capital Gains
-st.markdown('<h3 class="header">Income from Capital Gains</h3>', unsafe_allow_html=True)
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Capital Gains Subcategories
+st.markdown('<h3 class="header">Capital Gains</h3>', unsafe_allow_html=True)
+gains_real_estate = st.number_input("Gains on Sale of Real Estate (in PKR):", min_value=0, value=0, step=1000)
+gains_stocks = st.number_input("Gains on Sale of Stocks (in PKR):", min_value=0, value=0, step=1000)
+holding_period_stocks = st.selectbox("Holding Period for Stocks:", ["Up to 1 year", "1 to 2 years", "Over 2 years"])
+gains_bonds = st.number_input("Gains on Sale of Bonds (in PKR):", min_value=0, value=0, step=1000)
+gains_mutual_funds = st.number_input("Gains on Sale of Mutual Fund Units (in PKR):", min_value=0, value=0, step=1000)
+gains_other_investments = st.number_input("Gains on Sale of Other Investments (in PKR):", min_value=0, value=0, step=1000)
 
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Other Sources Subcategories
+st.markdown('<h3 class="header">Income from Other Sources</h3>', unsafe_allow_html=True)
+interest_income = st.number_input("Interest Income (in PKR):", min_value=0, value=0, step=1000)
+dividend_income_taxable = st.number_input("Dividend Income from Taxable Companies (in PKR):", min_value=0, value=0, step=1000)
+dividend_income_exempt = st.number_input("Dividend Income from Tax-Exempt Companies (in PKR):", min_value=0, value=0, step=1000)
+royalty_income = st.number_input("Royalty Income (in PKR):", min_value=0, value=0, step=1000)
+prize_money = st.number_input("Prize Money and Lottery Winnings (in PKR):", min_value=0, value=0, step=1000)
+pension_income = st.number_input("Pension and Annuities (in PKR):", min_value=0, value=0, step=1000)
 
-# Other Sources
-st.markdown('<h3 class="header">Other Sources</h3>', unsafe_allow_html=True)
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Foreign Income Subcategories
+st.markdown('<h3 class="header">Foreign Income</h3>', unsafe_allow_html=True)
+foreign_salaries = st.number_input("Salaries Earned Abroad (in PKR):", min_value=0, value=0, step=1000)
+foreign_business = st.number_input("Business Income from Foreign Operations (in PKR):", min_value=0, value=0, step=1000)
+foreign_dividends = st.number_input("Dividends and Interest Earned Overseas (in PKR):", min_value=0, value=0, step=1000)
+foreign_rental = st.number_input("Foreign Rental Income (in PKR):", min_value=0, value=0, step=1000)
 
 # Tax Calculation
 if st.button("📊 Calculate Tax"):
     total_income = (
-        salary_income + business_income + foreign_income + 
-        capital_gains_securities + capital_gains_property + sukuk_income +
-        dividend_income + prizes_winnings + profit_on_debt
+        salary_income + bonuses_commissions + gratuity + leave_encashment + perquisites + benefits_in_kind +
+        sole_proprietorship + partnership_income + corporate_income + manufacturing_income + agricultural_income + professional_services +
+        rental_residential + rental_commercial + leasing_income + subletting_income +
+        gains_real_estate + gains_stocks + gains_bonds + gains_mutual_funds + gains_other_investments +
+        interest_income + dividend_income_taxable + dividend_income_exempt + royalty_income + prize_money + pension_income +
+        foreign_salaries + foreign_business + foreign_dividends + foreign_rental
     )
     tax = 0
     tax_breakdown = []
 
-    # Salary Income Slabs
-    if salary_income > 0:
-        if salary_income <= 600000:
+    # Apply tax slabs for Salary Income
+    salary_total = salary_income + bonuses_commissions + gratuity + leave_encashment + perquisites + benefits_in_kind
+    if salary_total > 0:
+        if salary_total <= 600000:
             tax_breakdown.append("Salary Income: Tax-Free")
-        elif salary_income <= 1200000:
-            tax += (salary_income - 600000) * 0.05
-            tax_breakdown.append(f"Salary Income: 5% on PKR {salary_income - 600000}")
-        elif salary_income <= 2200000:
-            tax += 30000 + (salary_income - 1200000) * 0.15
-            tax_breakdown.append(f"Salary Income: PKR 30,000 + 15% on PKR {salary_income - 1200000}")
-        elif salary_income <= 3200000:
-            tax += 180000 + (salary_income - 2200000) * 0.25
-            tax_breakdown.append(f"Salary Income: PKR 180,000 + 25% on PKR {salary_income - 2200000}")
-        elif salary_income <= 4100000:
-            tax += 430000 + (salary_income - 3200000) * 0.3
-            tax_breakdown.append(f"Salary Income: PKR 430,000 + 30% on PKR {salary_income - 3200000}")
+        elif salary_total <= 1200000:
+            tax += (salary_total - 600000) * 0.05
+            tax_breakdown.append(f"Salary Income: 5% on PKR {salary_total - 600000}")
+        elif salary_total <= 2200000:
+            tax += 30000 + (salary_total - 1200000) * 0.15
+            tax_breakdown.append(f"Salary Income: PKR 30,000 + 15% on PKR {salary_total - 1200000}")
+        elif salary_total <= 3200000:
+            tax += 180000 + (salary_total - 2200000) * 0.25
+            tax_breakdown.append(f"Salary Income: PKR 180,000 + 25% on PKR {salary_total - 2200000}")
+        elif salary_total <= 4100000:
+            tax += 430000 + (salary_total - 3200000) * 0.3
+            tax_breakdown.append(f"Salary Income: PKR 430,000 + 30% on PKR {salary_total - 3200000}")
         else:
-            tax += 700000 + (salary_income - 4100000) * 0.35
-            tax_breakdown.append(f"Salary Income: PKR 700,000 + 35% on PKR {salary_income - 4100000}")
+            tax += 700000 + (salary_total - 4100000) * 0.35
+            tax_breakdown.append(f"Salary Income: PKR 700,000 + 35% on PKR {salary_total - 4100000}")
 
-    # Business Income Slabs
-    if business_income > 0:
-        if business_income <= 600000:
-            tax_breakdown.append("Business Income: Tax-Free")
-        elif business_income <= 1200000:
-            tax += (business_income - 600000) * 0.05
-            tax_breakdown.append(f"Business Income: 5% on PKR {business_income - 600000}")
-        elif business_income <= 2200000:
-            tax += 30000 + (business_income - 1200000) * 0.15
-            tax_breakdown.append(f"Business Income: PKR 30,000 + 15% on PKR {business_income - 1200000}")
-        elif business_income <= 3200000:
-            tax += 180000 + (business_income - 2200000) * 0.25
-            tax_breakdown.append(f"Business Income: PKR 180,000 + 25% on PKR {business_income - 2200000}")
-        elif business_income <= 4100000:
-            tax += 430000 + (business_income - 3200000) * 0.3
-            tax_breakdown.append(f"Business Income: PKR 430,000 + 30% on PKR {business_income - 3200000}")
-        else:
-            tax += 700000 + (business_income - 4100000) * 0.35
-            tax_breakdown.append(f"Business Income: PKR 700,000 + 35% on PKR {business_income - 4100000}")
+    # Apply tax rate for Foreign Income
+    foreign_total = foreign_salaries + foreign_business + foreign_dividends + foreign_rental
+    if foreign_total > 0:
+        tax += foreign_total * 0.01
+        tax_breakdown.append(f"Foreign Income: 1% on PKR {foreign_total}")
 
-    # Foreign Income Tax
-    if foreign_income > 0:
-        tax += foreign_income * 0.01
-        tax_breakdown.append(f"Foreign Income: 1% on PKR {foreign_income}")
-
-    # Capital Gains Tax
-    if capital_gains_securities > 0:
-        tax += capital_gains_securities * 0.125
-        tax_breakdown.append(f"Capital Gains (Securities): 12.5% on PKR {capital_gains_securities}")
-    if capital_gains_property > 0:
-        tax += capital_gains_property * 0.15
-        tax_breakdown.append(f"Capital Gains (Properties): 15% on PKR {capital_gains_property}")
-
-    # Other Sources Tax
-    if sukuk_income > 0:
-        tax += sukuk_income * 0.1
-        tax_breakdown.append(f"Sukuk Income: 10% on PKR {sukuk_income}")
-    if dividend_income > 0:
-        tax += dividend_income * 0.15
-        tax_breakdown.append(f"Dividend Income: 15% on PKR {dividend_income}")
-    if prizes_winnings > 0:
-        tax += prizes_winnings * 0.2
-        tax_breakdown.append(f"Prizes and Winnings: 20% on PKR {prizes_winnings}")
-    if profit_on_debt > 0:
-        tax += profit_on_debt * 0.15
-        tax_breakdown.append(f"Profit on Debt: 15% on PKR {profit_on_debt}")
+    # Add more tax calculations for other income sources based on provided rates
+    # For example:
+    # - Rental Income slabs
+    # - Holding periods for capital gains
+    # - Withholding tax for other sources
 
     # Display Results
     st.success(f"Your total income: PKR {total_income}")
@@ -161,10 +139,12 @@ if st.button("📊 Calculate Tax"):
 
     # Visualize Tax Breakdown
     breakdown_data = {
-        "Salary": salary_income, "Business": business_income, "Foreign": foreign_income,
-        "Cap. Gains (Securities)": capital_gains_securities, "Cap. Gains (Properties)": capital_gains_property,
-        "Sukuk": sukuk_income, "Dividend": dividend_income, "Prizes": prizes_winnings,
-        "Debt": profit_on_debt
+        "Salary": salary_total,
+        "Business": sole_proprietorship + partnership_income + corporate_income + manufacturing_income + agricultural_income + professional_services,
+        "Property": rental_residential + rental_commercial + leasing_income + subletting_income,
+        "Capital Gains": gains_real_estate + gains_stocks + gains_bonds + gains_mutual_funds + gains_other_investments,
+        "Other Sources": interest_income + dividend_income_taxable + dividend_income_exempt + royalty_income + prize_money + pension_income,
+        "Foreign Income": foreign_total
     }
 
     fig, ax = plt.subplots()
