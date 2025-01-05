@@ -46,18 +46,21 @@ def hierarchical_menu():
             if st.button("Add Salary Income", key="add_salary"):
                 tax = calculate_salary_tax(salary_income)
                 st.session_state["selected_items"]["Income Sources"].append(("Salary", salary_income, tax))
+                st.success("Salary income added successfully.")
         elif income_main_categories == "Income from Business":
             business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
             business_type = st.selectbox("Select Business Type:", ["Corporate", "Small Company", "Sole Proprietorship"])
             if st.button("Add Business Income", key="add_business"):
                 tax = calculate_business_tax(business_income, business_type)
                 st.session_state["selected_items"]["Income Sources"].append(("Business", business_income, tax))
+                st.success("Business income added successfully.")
         elif income_main_categories == "Capital Gains":
             gains_income = st.number_input("Enter Capital Gains (in PKR):", min_value=0, value=0, step=1000)
             holding_period = st.number_input("Enter Holding Period (in years):", min_value=0, value=1, step=1)
             if st.button("Add Capital Gains", key="add_capital_gains"):
                 tax = calculate_capital_gains_tax(gains_income, holding_period)
                 st.session_state["selected_items"]["Income Sources"].append(("Capital Gains", gains_income, tax))
+                st.success("Capital gains added successfully.")
 
     elif selected_main_category == "Deductions":
         selected_deduction = st.multiselect("Select Deductions:", [
@@ -70,10 +73,12 @@ def hierarchical_menu():
                 custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
                 if st.button(f"Add Custom Deduction", key=f"add_{custom_name}_deduction"):
                     st.session_state["selected_items"]["Deductions"].append((custom_name, custom_value))
+                    st.success(f"Custom deduction {custom_name} added successfully.")
             else:
                 value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_deduction")
                 if st.button(f"Add {selection}", key=f"add_{selection}_deduction"):
                     st.session_state["selected_items"]["Deductions"].append((selection, value))
+                    st.success(f"Deduction {selection} added successfully.")
 
     elif selected_main_category == "Tax Credits":
         selected_credit = st.multiselect("Select Tax Credits:", [
@@ -87,10 +92,12 @@ def hierarchical_menu():
                 custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
                 if st.button(f"Add Custom Tax Credit", key=f"add_{custom_name}_credit"):
                     st.session_state["selected_items"]["Tax Credits"].append((custom_name, custom_value))
+                    st.success(f"Custom tax credit {custom_name} added successfully.")
             else:
                 value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_credit")
                 if st.button(f"Add {selection}", key=f"add_{selection}_credit"):
                     st.session_state["selected_items"]["Tax Credits"].append((selection, value))
+                    st.success(f"Tax credit {selection} added successfully.")
 
 # Calculate taxes
 def calculate_tax():
