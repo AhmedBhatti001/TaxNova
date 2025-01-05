@@ -28,7 +28,38 @@ if "selected_items" not in st.session_state:
         "Tax Credits": []
     }
 
-# Dropdown for hierarchical selection with custom input option
+def calculate_salary_tax(income):
+    slabs = [
+        {"limit": 600000, "rate": 0},
+        {"limit": 1200000, "rate": 0.05, "base_tax": 0},
+        {"limit": 2200000, "rate": 0.15, "base_tax": 30000},
+        {"limit": 3200000, "rate": 0.25, "base_tax": 180000},
+        {"limit": 4100000, "rate": 0.30, "base_tax": 430000},
+        {"limit": float("inf"), "rate": 0.35, "base_tax": 700000}
+    ]
+    for slab in slabs:
+        if income <= slab["limit"]:
+            previous_limit = slabs[slabs.index(slab) - 1]["limit"] if slabs.index(slab) > 0 else 0
+            return slab.get("base_tax", 0) + (income - previous_limit) * slab["rate"]
+
+def calculate_business_tax(income, business_type):
+    if business_type == "Corporate":
+        return income * 0.29  # Flat 29% tax rate
+    elif business_type == "Small Company":
+        return income * 0.20  # Flat 20% tax rate
+    else:  # Sole proprietorship or partnerships
+        return calculate_salary_tax(income)
+
+def calculate_capital_gains_tax(income, holding_period):
+    if holding_period <= 1:
+        return income * 0.10
+    elif holding_period <= 2:
+        return income * 0.075
+    elif holding_period <= 3:
+        return income * 0.05
+    else:
+        return 0
+
 def hierarchical_menu():
     st.markdown('<h2 class="header">Select Categories</h2>', unsafe_allow_html=True)
 
@@ -41,104 +72,32 @@ def hierarchical_menu():
             "Salary", "Income from Business", "Income from Property", "Capital Gains", 
             "Income from Other Sources", "Foreign Income", "Custom Input"
         ])
-        if income_main_categories == "Custom Input":
-            custom_name = st.text_input("Enter Custom Income Name:")
-            custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-            if st.button("Add Custom Income"):
-                st.session_state["selected_items"]["Income Sources"].append((custom_name, custom_value))
-        elif income_main_categories == "Salary":
-            selected_salary = st.multiselect("Select Salary Components:", [
-                "Basic Salary", "Bonuses", "Gratuity", "Leave Encashment", "Perquisites", "Benefits in Kind"
-            ])
-            for selection in selected_salary:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_income")
-                if st.button(f"Add {selection}", key=f"add_{selection}"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+        if income_main_categories == "Salary":
+            salary_income = st.number_input("Enter Total Salary Income (in PKR):", min_value=0, value=0, step=1000)
+            if st.button("Add Salary Income"):
+                tax = calculate_salary_tax(salary_income)
+                st.session_state["selected_items"]["Income Sources"].append(("Salary", salary_income, tax))
         elif income_main_categories == "Income from Business":
-            selected_business = st.multiselect("Select Business Income Type:", [
-                "Sole Proprietorship Income", "Partnership Income", "Corporate Business Income", 
-                "Profits from Manufacturing"
-            ])
-            for selection in selected_business:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_business")
-                if st.button(f"Add {selection}", key=f"add_{selection}_business"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
-        elif income_main_categories == "Income from Property":
-            selected_property = st.multiselect("Select Property Income Type:", [
-                "Rental Income from Residential Properties", "Rental Income from Commercial Properties", 
-                "Leasing Income", "Subletting Income"
-            ])
-            for selection in selected_property:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_property")
-                if st.button(f"Add {selection}", key=f"add_{selection}_property"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
+            business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
+            business_type = st.selectbox("Select Business Type:", ["Corporate", "Small Company", "Sole Proprietorship"])
+            if st.button("Add Business Income"):
+                tax = calculate_business_tax(business_income, business_type)
+                st.session_state["selected_items"]["Income Sources"].append(("Business", business_income, tax))
         elif income_main_categories == "Capital Gains":
-            selected_gains = st.multiselect("Select Capital Gains Type:", [
-                "Gains on Sale of Real Estate", "Gains on Sale of Stocks", "Gains on Sale of Bonds"
-            ])
-            for selection in selected_gains:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_gains")
-                if st.button(f"Add {selection}", key=f"add_{selection}_gains"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
-        elif income_main_categories == "Income from Other Sources":
-            selected_others = st.multiselect("Select Other Income Type:", [
-                "Interest Income", "Dividend Income", "Royalty Income", "Prize Money"
-            ])
-            for selection in selected_others:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_others")
-                if st.button(f"Add {selection}", key=f"add_{selection}_others"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
-        elif income_main_categories == "Foreign Income":
-            selected_foreign = st.multiselect("Select Foreign Income Type:", [
-                "Salaries Earned Abroad", "Business Income from Foreign Operations", 
-                "Dividends and Interest Earned Overseas", "Foreign Rental Income"
-            ])
-            for selection in selected_foreign:
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_foreign")
-                if st.button(f"Add {selection}", key=f"add_{selection}_foreign"):
-                    st.session_state["selected_items"]["Income Sources"].append((selection, value))
-
-    elif selected_main_category == "Deductions":
-        selected_deduction = st.multiselect("Select Deductions:", [
-            "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions",
-            "Housing Loan Interest", "Depreciation", "Advertising Costs", "Employee Contributions", "Custom Input"
-        ])
-        if "Custom Input" in selected_deduction:
-            custom_name = st.text_input("Enter Custom Deduction Name:")
-            custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-            if st.button("Add Custom Deduction"):
-                st.session_state["selected_items"]["Deductions"].append((custom_name, custom_value))
-        for selection in selected_deduction:
-            if selection != "Custom Input":
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_deduction")
-                if st.button(f"Add {selection}", key=f"add_{selection}_deduction"):
-                    st.session_state["selected_items"]["Deductions"].append((selection, value))
-
-    elif selected_main_category == "Tax Credits":
-        selected_credit = st.multiselect("Select Tax Credits:", [
-            "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment",
-            "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
-            "IT and Startups", "Green Investments", "Welfare Projects", "Custom Input"
-        ])
-        if "Custom Input" in selected_credit:
-            custom_name = st.text_input("Enter Custom Tax Credit Name:")
-            custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-            if st.button("Add Custom Tax Credit"):
-                st.session_state["selected_items"]["Tax Credits"].append((custom_name, custom_value))
-        for selection in selected_credit:
-            if selection != "Custom Input":
-                value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_credit")
-                if st.button(f"Add {selection}", key=f"add_{selection}_credit"):
-                    st.session_state["selected_items"]["Tax Credits"].append((selection, value))
+            gains_income = st.number_input("Enter Capital Gains (in PKR):", min_value=0, value=0, step=1000)
+            holding_period = st.number_input("Enter Holding Period (in years):", min_value=0, value=1, step=1)
+            if st.button("Add Capital Gains"):
+                tax = calculate_capital_gains_tax(gains_income, holding_period)
+                st.session_state["selected_items"]["Income Sources"].append(("Capital Gains", gains_income, tax))
 
 # Calculate taxes
 def calculate_tax():
-    total_income = sum(value for _, value in st.session_state["selected_items"]["Income Sources"])
+    total_income = sum(value for _, value, _ in st.session_state["selected_items"]["Income Sources"])
     total_deductions = sum(value for _, value in st.session_state["selected_items"]["Deductions"])
     total_credits = sum(value for _, value in st.session_state["selected_items"]["Tax Credits"])
 
     taxable_income = max(total_income - total_deductions, 0)
-    tax_payable_before_credits = taxable_income * 0.10  # Example flat tax rate
+    tax_payable_before_credits = sum(tax for _, _, tax in st.session_state["selected_items"]["Income Sources"])
     final_tax = max(tax_payable_before_credits - total_credits, 0)
 
     return total_income, total_deductions, total_credits, taxable_income, final_tax
@@ -153,8 +112,8 @@ def main():
 
     st.markdown('<h2 class="header">Selected Items Summary</h2>', unsafe_allow_html=True)
     st.write("### Income Sources:")
-    for item, value in st.session_state["selected_items"]["Income Sources"]:
-        st.write(f"- {item}: PKR {value}")
+    for item, value, tax in st.session_state["selected_items"]["Income Sources"]:
+        st.write(f"- {item}: PKR {value} | Tax: PKR {tax}")
 
     st.write("### Deductions:")
     for item, value in st.session_state["selected_items"]["Deductions"]:
