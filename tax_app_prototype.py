@@ -99,12 +99,57 @@ def handle_income_sources():
             st.session_state["selected_items"]["Income Sources"].append((foreign_income, foreign_value, 0))
             st.success(f"{foreign_income} added successfully.")
 
-# Display income sources with red highlights
+# Function to dynamically handle deductions
+def handle_deductions():
+    selected_deduction = st.multiselect("Select Deductions:", [
+        "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions",
+        "Housing Loan Interest", "Depreciation", "Advertising Costs", "Employee Contributions", "Custom Input"
+    ])
+    for selection in selected_deduction:
+        if selection == "Custom Input":
+            custom_name = st.text_input("Enter Custom Deduction Name:")
+            custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
+            if st.button(f"Add Custom Deduction", key=f"add_{custom_name}_deduction"):
+                st.session_state["selected_items"]["Deductions"].append((custom_name, custom_value))
+                st.success(f"Custom deduction {custom_name} added successfully.")
+        else:
+            value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_deduction")
+            if st.button(f"Add {selection}", key=f"add_{selection}_deduction"):
+                st.session_state["selected_items"]["Deductions"].append((selection, value))
+                st.success(f"Deduction {selection} added successfully.")
+
+# Function to dynamically handle tax credits
+def handle_tax_credits():
+    selected_credit = st.multiselect("Select Tax Credits:", [
+        "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment",
+        "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
+        "IT and Startups", "Green Investments", "Welfare Projects", "Custom Input"
+    ])
+    for selection in selected_credit:
+        if selection == "Custom Input":
+            custom_name = st.text_input("Enter Custom Tax Credit Name:")
+            custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
+            if st.button(f"Add Custom Tax Credit", key=f"add_{custom_name}_credit"):
+                st.session_state["selected_items"]["Tax Credits"].append((custom_name, custom_value))
+                st.success(f"Custom tax credit {custom_name} added successfully.")
+        else:
+            value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000, key=f"{selection}_credit")
+            if st.button(f"Add {selection}", key=f"add_{selection}_credit"):
+                st.session_state["selected_items"]["Tax Credits"].append((selection, value))
+                st.success(f"Tax credit {selection} added successfully.")
+
+# Display selected items
 def display_selected_items():
     st.markdown('<h2 class="header">Selected Items Summary</h2>', unsafe_allow_html=True)
     st.write("### Income Sources:")
     for item, value, tax in st.session_state["selected_items"]["Income Sources"]:
         st.markdown(f"<span class='highlight'>- {item}: PKR {value} | Tax: PKR {tax}</span>", unsafe_allow_html=True)
+    st.write("### Deductions:")
+    for item, value in st.session_state["selected_items"]["Deductions"]:
+        st.markdown(f"<span class='highlight'>- {item}: PKR {value}</span>", unsafe_allow_html=True)
+    st.write("### Tax Credits:")
+    for item, value in st.session_state["selected_items"]["Tax Credits"]:
+        st.markdown(f"<span class='highlight'>- {item}: PKR {value}</span>", unsafe_allow_html=True)
 
 # Main function
 def main():
@@ -116,6 +161,10 @@ def main():
 
     if selected_main_category == "Income Sources":
         handle_income_sources()
+    elif selected_main_category == "Deductions":
+        handle_deductions()
+    elif selected_main_category == "Tax Credits":
+        handle_tax_credits()
 
     display_selected_items()
 
