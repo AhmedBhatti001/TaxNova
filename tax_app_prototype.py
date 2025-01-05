@@ -1,192 +1,142 @@
 import streamlit as st
-import requests
-import matplotlib.pyplot as plt
+import pandas as pd
+from openpyxl import load_workbook
 
-# Set custom theme styles using markdown and container formatting
-st.markdown(
-    """
-    <style>
-    .income-box {
-        border: 2px solid #4CAF50;
-        border-radius: 10px;
-        background-color: #f9f9f9;
-        padding: 10px;
-        margin-bottom: 10px;
-    }
-    .note {
-        font-size: 14px;
-        color: #555;
-    }
-    .header {
-        color: #4CAF50;
-        font-size: 24px;
-        margin-bottom: 20px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+# Load Excel data
+def load_excel(file_path):
+    excel_data = pd.ExcelFile(file_path)
+    return excel_data
 
-# Title and Introduction
-st.markdown('<h1 class="header">🏦 TaxNova: Tax Assessment and Guidance App</h1>', unsafe_allow_html=True)
-st.write("This app provides an enhanced tax calculation and allows users to provide feedback for continuous improvement.")
+# Display sheet data
+def display_sheet(excel_data, sheet_name):
+    data = pd.read_excel(excel_data, sheet_name=sheet_name)
+    st.write(f"### Data from Sheet: {sheet_name}")
+    st.dataframe(data)
+    return data
 
-# Add a note
-st.markdown('<p class="note">*Please enter your yearly income in the fields below.</p>', unsafe_allow_html=True)
+# Extract formulas from Excel sheet
+def extract_formulas(file_path, sheet_name):
+    wb = load_workbook(file_path, data_only=False)
+    sheet = wb[sheet_name]
 
-# Input Form
-st.markdown('<h2 class="header">📄 Enter Your Income Details</h2>', unsafe_allow_html=True)
+    formulas = {}
+    for row in sheet.iter_rows():
+        for cell in row:
+            if cell.formula:  # Check if the cell contains a formula
+                formulas[cell.coordinate] = cell.formula
 
-# Variables for calculations
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-salary_income = st.number_input("Enter Salary Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+    return formulas
 
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
+# Display formulas
+def display_formulas(file_path, sheet_name):
+    st.write(f"### Formulas in Sheet: {sheet_name}")
+    formulas = extract_formulas(file_path, sheet_name)
 
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-foreign_income = st.number_input("Enter Foreign Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Capital Gains
-st.markdown('<h3 class="header">Income from Capital Gains</h3>', unsafe_allow_html=True)
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-capital_gains_securities = st.number_input("Enter Capital Gain from Securities (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-capital_gains_property = st.number_input("Enter Capital Gain from Properties (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Other Sources
-st.markdown('<h3 class="header">Other Sources</h3>', unsafe_allow_html=True)
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-sukuk_income = st.number_input("Enter Sukuk Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-dividend_income = st.number_input("Enter Dividend Income (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-prizes_winnings = st.number_input("Enter Prizes and Winnings (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-st.markdown('<div class="income-box">', unsafe_allow_html=True)
-profit_on_debt = st.number_input("Enter Profit on Debt (in PKR):", min_value=0, value=0, step=1000)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Tax Calculation
-if st.button("📊 Calculate Tax"):
-    total_income = (
-        salary_income + business_income + foreign_income + 
-        capital_gains_securities + capital_gains_property + sukuk_income +
-        dividend_income + prizes_winnings + profit_on_debt
-    )
-    tax = 0
-    tax_breakdown = []
-
-    # Salary Income Slabs
-    if salary_income > 0:
-        if salary_income <= 600000:
-            tax_breakdown.append("Salary Income: Tax-Free")
-        elif salary_income <= 1200000:
-            tax += (salary_income - 600000) * 0.05
-            tax_breakdown.append(f"Salary Income: 5% on PKR {salary_income - 600000}")
-        elif salary_income <= 2200000:
-            tax += 30000 + (salary_income - 1200000) * 0.15
-            tax_breakdown.append(f"Salary Income: PKR 30,000 + 15% on PKR {salary_income - 1200000}")
-        elif salary_income <= 3200000:
-            tax += 180000 + (salary_income - 2200000) * 0.25
-            tax_breakdown.append(f"Salary Income: PKR 180,000 + 25% on PKR {salary_income - 2200000}")
-        elif salary_income <= 4100000:
-            tax += 430000 + (salary_income - 3200000) * 0.3
-            tax_breakdown.append(f"Salary Income: PKR 430,000 + 30% on PKR {salary_income - 3200000}")
-        else:
-            tax += 700000 + (salary_income - 4100000) * 0.35
-            tax_breakdown.append(f"Salary Income: PKR 700,000 + 35% on PKR {salary_income - 4100000}")
-
-    # Business Income Slabs
-    if business_income > 0:
-        if business_income <= 600000:
-            tax_breakdown.append("Business Income: Tax-Free")
-        elif business_income <= 1200000:
-            tax += (business_income - 600000) * 0.05
-            tax_breakdown.append(f"Business Income: 5% on PKR {business_income - 600000}")
-        elif business_income <= 2200000:
-            tax += 30000 + (business_income - 1200000) * 0.15
-            tax_breakdown.append(f"Business Income: PKR 30,000 + 15% on PKR {business_income - 1200000}")
-        elif business_income <= 3200000:
-            tax += 180000 + (business_income - 2200000) * 0.25
-            tax_breakdown.append(f"Business Income: PKR 180,000 + 25% on PKR {business_income - 2200000}")
-        elif business_income <= 4100000:
-            tax += 430000 + (business_income - 3200000) * 0.3
-            tax_breakdown.append(f"Business Income: PKR 430,000 + 30% on PKR {business_income - 3200000}")
-        else:
-            tax += 700000 + (business_income - 4100000) * 0.35
-            tax_breakdown.append(f"Business Income: PKR 700,000 + 35% on PKR {business_income - 4100000}")
-
-    # Foreign Income Tax
-    if foreign_income > 0:
-        tax += foreign_income * 0.01
-        tax_breakdown.append(f"Foreign Income: 1% on PKR {foreign_income}")
-
-    # Capital Gains Tax
-    if capital_gains_securities > 0:
-        tax += capital_gains_securities * 0.125
-        tax_breakdown.append(f"Capital Gains (Securities): 12.5% on PKR {capital_gains_securities}")
-    if capital_gains_property > 0:
-        tax += capital_gains_property * 0.15
-        tax_breakdown.append(f"Capital Gains (Properties): 15% on PKR {capital_gains_property}")
-
-    # Other Sources Tax
-    if sukuk_income > 0:
-        tax += sukuk_income * 0.1
-        tax_breakdown.append(f"Sukuk Income: 10% on PKR {sukuk_income}")
-    if dividend_income > 0:
-        tax += dividend_income * 0.15
-        tax_breakdown.append(f"Dividend Income: 15% on PKR {dividend_income}")
-    if prizes_winnings > 0:
-        tax += prizes_winnings * 0.2
-        tax_breakdown.append(f"Prizes and Winnings: 20% on PKR {prizes_winnings}")
-    if profit_on_debt > 0:
-        tax += profit_on_debt * 0.15
-        tax_breakdown.append(f"Profit on Debt: 15% on PKR {profit_on_debt}")
-
-    # Display Results
-    st.success(f"Your total income: PKR {total_income}")
-    st.success(f"Your estimated tax: PKR {tax}")
-
-    # Visualize Tax Breakdown
-    breakdown_data = {
-        "Salary": salary_income, "Business": business_income, "Foreign": foreign_income,
-        "Cap. Gains (Securities)": capital_gains_securities, "Cap. Gains (Properties)": capital_gains_property,
-        "Sukuk": sukuk_income, "Dividend": dividend_income, "Prizes": prizes_winnings,
-        "Debt": profit_on_debt
-    }
-
-    fig, ax = plt.subplots()
-    ax.bar(breakdown_data.keys(), breakdown_data.values(), color="#4CAF50")
-    ax.set_title("Income Breakdown")
-    ax.set_ylabel("Amount (PKR)")
-    st.pyplot(fig)
-
-# Feedback Section
-st.header("📝 Feedback")
-feedback = st.text_area("Is anything missing or needed to calculate? Provide your feedback below:")
-if st.button("Submit Feedback"):
-    if feedback:
-        # Log feedback to a file
-        with open("feedback_log.txt", "a") as file:
-            file.write(f"{feedback}\n")
-        st.success("Thank you for your feedback! It has been saved for review.")
+    if formulas:
+        for cell, formula in formulas.items():
+            st.write(f"Cell {cell}: {formula}")
     else:
-        st.warning("Please enter feedback before submitting.")
+        st.write("No formulas found in this sheet.")
 
-# Sidebar
-with st.sidebar:
-    st.header("🛠️ Settings")
-    theme_toggle = st.checkbox("Enable Dark Mode")
-    st.write("Customize your app appearance and settings.")
+# Calculate Tax with Brackets
+
+def calculate_tax_with_brackets(data):
+    # Income Sources and Codes
+    income_sources = {
+        "Income/(loss) from property": "2000",
+        "Rent received or receivable": "2001",
+        "1/10th of amount not adjustable against rent": "2002",
+        "Forfeited deposit under a contract for sale of property": "2003",
+        "Recovery of Unpaid Irrecoverable Rent allowed as deduction": "2004",
+        "Income from Business": "3000",
+        "Gains / (Loss) from Capital Assets (including securities)": "4000",
+        "Income / (Loss) from Other Sources": "5000",
+        "Foreign Income": "6000",
+        "Agriculture Income": "6100",
+    }
+
+    deductions = {
+        "Zakat u/s 60": "9001",
+        "Workers Welfare Fund u/s 60A": "9002",
+        "Educational expenses u/s 60D": "9008",
+        "Import u/s 148 @1%": "64010052",
+        "Import u/s 148 @2%": "64010054",
+        "Import u/s 148 @3%": "64010056",
+        "Dividend u/s 150 @7.5%": "64030052",
+        "Yield on Behbood Certificates": "64030071",
+        "Profit on Debt u/s 7B": "64310056",
+        "Capital Gains on Securities u/s 37A @ 15%": "64220156",
+    }
+
+    computations = {
+        "Taxable Income": "9100",
+        "Normal Income Tax": "9200",
+        "Tax Credits": "9329",
+    }
+
+    # Extract Income Values
+    total_income = 0
+    for source, code in income_sources.items():
+        if code in data.columns:
+            total_income += data[code].sum()
+
+    # Extract Deduction Values
+    total_deductions = 0
+    for deduction, code in deductions.items():
+        if code in data.columns:
+            total_deductions += data[code].sum()
+
+    # Calculate Taxable Income
+    taxable_income = total_income - total_deductions
+
+    # Define Tax Brackets (Example)
+    tax_brackets = [
+        (0, 50000, 0.05),
+        (50001, 100000, 0.10),
+        (100001, 200000, 0.15),
+        (200001, float('inf'), 0.20),
+    ]
+
+    tax = 0
+    for bracket in tax_brackets:
+        lower, upper, rate = bracket
+        if taxable_income > lower:
+            taxable_income_in_bracket = min(taxable_income, upper) - lower
+            tax += taxable_income_in_bracket * rate
+
+    st.write("### Tax Calculation")
+    st.write(f"Total Income: {total_income}")
+    st.write(f"Total Deductions: {total_deductions}")
+    st.write(f"Taxable Income: {taxable_income}")
+    st.write(f"Total Tax Payable: {tax}")
+
+# Main Streamlit App
+def main():
+    st.title("Income Tax Assessment Tool")
+
+    # File Upload
+    uploaded_file = st.file_uploader("Upload your Excel file", type=["xlsx"])
+
+    if uploaded_file is not None:
+        excel_data = load_excel(uploaded_file)
+
+        # Sheet Selection
+        sheet_names = excel_data.sheet_names
+        selected_sheet = st.selectbox("Select a sheet to view", sheet_names)
+
+        if selected_sheet:
+            data = display_sheet(excel_data, selected_sheet)
+
+            # Display Formulas
+            if st.button("Show Formulas"):
+                display_formulas(uploaded_file, selected_sheet)
+
+            # Tax Calculation
+            if st.button("Calculate Tax"):
+                calculate_tax_with_brackets(data)
+
+    else:
+        st.write("Please upload an Excel file to proceed.")
+
+if __name__ == "__main__":
+    main()
