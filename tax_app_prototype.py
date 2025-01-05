@@ -28,6 +28,41 @@ if "selected_items" not in st.session_state:
         "Tax Credits": []
     }
 
+# Function to calculate salary tax
+def calculate_salary_tax(income):
+    slabs = [
+        {"limit": 600000, "rate": 0},
+        {"limit": 1200000, "rate": 0.05, "base_tax": 0},
+        {"limit": 2200000, "rate": 0.15, "base_tax": 30000},
+        {"limit": 3200000, "rate": 0.25, "base_tax": 180000},
+        {"limit": 4100000, "rate": 0.30, "base_tax": 430000},
+        {"limit": float("inf"), "rate": 0.35, "base_tax": 700000},
+    ]
+    for slab in slabs:
+        if income <= slab["limit"]:
+            previous_limit = slabs[slabs.index(slab) - 1]["limit"] if slabs.index(slab) > 0 else 0
+            return slab.get("base_tax", 0) + (income - previous_limit) * slab["rate"]
+
+# Function to calculate business tax
+def calculate_business_tax(income, business_type):
+    if business_type == "Corporate":
+        return income * 0.29  # Flat 29% tax rate
+    elif business_type == "Small Company":
+        return income * 0.20  # Flat 20% tax rate
+    else:  # Sole proprietorship or partnerships
+        return calculate_salary_tax(income)
+
+# Function to calculate capital gains tax
+def calculate_capital_gains_tax(income, holding_period):
+    if holding_period <= 1:
+        return income * 0.10
+    elif holding_period <= 2:
+        return income * 0.075
+    elif holding_period <= 3:
+        return income * 0.05
+    else:
+        return 0
+
 # Ensure each category can add multiple items dynamically without overwriting previous selections
 def hierarchical_menu():
     st.markdown('<h2 class="header">Select Categories</h2>', unsafe_allow_html=True)
