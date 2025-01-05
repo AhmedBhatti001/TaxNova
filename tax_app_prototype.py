@@ -142,7 +142,8 @@ def handle_tax_credits():
         "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
         "IT and Startups", "Green Investments", "Welfare Projects", "Custom Input"
     ])
-    for selection in selected_credit:
+    for selection in
+  selected_credit:
         if selection == "Custom Input":
             custom_name = st.text_input("Enter Custom Tax Credit Name:")
             custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
@@ -167,17 +168,6 @@ def display_selected_items():
     st.write("### Tax Credits:")
     for item, value in st.session_state["selected_items"]["Tax Credits"]:
         st.markdown(f"<div class='selected-item'>{item}: PKR {value}</div>", unsafe_allow_html=True)
-
-# Add reset logic
-def reset_calculations():
-    if st.button("🔄 Reset Calculations"):
-        st.session_state["selected_items"] = {
-            "Income Sources": [],
-            "Deductions": [],
-            "Tax Credits": []
-        }
-        st.success("All calculations have been reset.")
-        st.experimental_rerun()
 
 # Add calculate tax payable logic
 def calculate_tax_payable():
@@ -215,7 +205,6 @@ def main():
 
     display_selected_items()
     calculate_tax_payable()
-    reset_calculations()
 
 if __name__ == "__main__":
     main()
