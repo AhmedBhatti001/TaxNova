@@ -18,6 +18,14 @@ def set_styles():
         .highlight {
             color: red;
         }
+        .selected-item {
+            background-color: #FFD2D2;
+            border: 1px solid red;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            display: inline-block;
+        }
         </style>
         """,
         unsafe_allow_html=True
@@ -143,13 +151,13 @@ def display_selected_items():
     st.markdown('<h2 class="header">Selected Items Summary</h2>', unsafe_allow_html=True)
     st.write("### Income Sources:")
     for item, value, tax in st.session_state["selected_items"]["Income Sources"]:
-        st.markdown(f"<span class='highlight'>- {item}: PKR {value} | Tax: PKR {tax}</span>", unsafe_allow_html=True)
+        st.markdown(f"<div class='selected-item'>{item}: PKR {value} | Tax: PKR {tax}</div>", unsafe_allow_html=True)
     st.write("### Deductions:")
     for item, value in st.session_state["selected_items"]["Deductions"]:
-        st.markdown(f"<span class='highlight'>- {item}: PKR {value}</span>", unsafe_allow_html=True)
+        st.markdown(f"<div class='selected-item'>{item}: PKR {value}</div>", unsafe_allow_html=True)
     st.write("### Tax Credits:")
     for item, value in st.session_state["selected_items"]["Tax Credits"]:
-        st.markdown(f"<span class='highlight'>- {item}: PKR {value}</span>", unsafe_allow_html=True)
+        st.markdown(f"<div class='selected-item'>{item}: PKR {value}</div>", unsafe_allow_html=True)
 
 # Add reset logic
 def reset_calculations():
