@@ -54,27 +54,14 @@ def calculate_salary_tax(income):
             previous_limit = slabs[slabs.index(slab) - 1]["limit"] if slabs.index(slab) > 0 else 0
             return slab.get("base_tax", 0) + (income - previous_limit) * slab["rate"]
 
-# Function to calculate tax payable
-def calculate_tax_payable():
-    total_income = sum([value for _, value, _ in st.session_state["selected_items"]["Income Sources"]])
-    total_deductions = sum([value for _, value in st.session_state["selected_items"]["Deductions"]])
-    total_credits = sum([value for _, value in st.session_state["selected_items"]["Tax Credits"]])
-
-    # Apply tax slabs for taxable income
-    taxable_income = total_income - total_deductions
-    if taxable_income < 0:
-        taxable_income = 0
-
-    tax_payable = 0
-    for _, value, tax in st.session_state["selected_items"]["Income Sources"]:
-        tax_payable += tax
-
-    # Apply tax credits
-    tax_payable -= total_credits
-    if tax_payable < 0:
-        tax_payable = 0
-
-    return total_income, total_deductions, total_credits, taxable_income, tax_payable
+# Function to calculate business tax
+def calculate_business_tax(income, business_type):
+    if business_type == "Corporate":
+        return income * 0.29  # 29% tax rate for corporate
+    elif business_type == "Small Company":
+        return income * 0.20  # 20% tax rate for small companies
+    elif business_type == "Sole Proprietorship":
+        return calculate_salary_tax(income)  # Use salary slabs for sole proprietorship
 
 # Function to dynamically handle income source selections
 def handle_income_sources():
@@ -92,7 +79,7 @@ def handle_income_sources():
         business_income = st.number_input("Enter Business Income (in PKR):", min_value=0, value=0, step=1000)
         business_type = st.selectbox("Select Business Type:", ["Corporate", "Small Company", "Sole Proprietorship"])
         if st.button("Add Business Income", key="add_business"):
-            tax = calculate_salary_tax(business_income)  # Adjust logic for specific business type
+            tax = calculate_business_tax(business_income, business_type)  # Adjust logic for specific business type
             st.session_state["selected_items"]["Income Sources"].append(("Business", business_income, tax))
             st.success("Business income added successfully.")
     elif income_main_categories == "Income from Property":
@@ -191,20 +178,6 @@ def reset_calculations():
         }
         st.success("All calculations have been reset.")
 
-# Add the calculate button
-def add_calculate_button():
-    if st.button("📊 Calculate Tax Payable"):
-        total_income, total_deductions, total_credits, taxable_income, tax_payable = calculate_tax_payable()
-        
-        # Display results
-        st.markdown("### 📋 Tax Summary:")
-        st.write(f"**Total Income:** PKR {total_income}")
-        st.write(f"**Total Deductions:** PKR {total_deductions}")
-        st.write(f"**Total Tax Credits:** PKR {total_credits}")
-        st.write(f"**Taxable Income:** PKR {taxable_income}")
-        st.write(f"**Tax Payable:** PKR {tax_payable}")
-        st.success("Calculation completed successfully!")
-
 # Main function
 def main():
     set_styles()
@@ -221,7 +194,6 @@ def main():
         handle_tax_credits()
 
     display_selected_items()
-    add_calculate_button()  # Add the calculate button
     reset_calculations()
 
 if __name__ == "__main__":
