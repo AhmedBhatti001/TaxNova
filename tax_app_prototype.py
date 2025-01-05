@@ -142,8 +142,7 @@ def handle_tax_credits():
         "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
         "IT and Startups", "Green Investments", "Welfare Projects", "Custom Input"
     ])
-    for selection in
-  selected_credit:
+    for selection in selected_credit:
         if selection == "Custom Input":
             custom_name = st.text_input("Enter Custom Tax Credit Name:")
             custom_value = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
