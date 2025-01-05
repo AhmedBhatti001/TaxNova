@@ -198,3 +198,43 @@ def main():
 
 if __name__ == "__main__":
     main()
+  # Add calculate tax payable logic
+def calculate_tax_payable():
+    if st.button("✅ Calculate Tax Payable", key="calculate_tax"):
+        total_income = sum(value for _, value, _ in st.session_state["selected_items"]["Income Sources"])
+        total_tax = sum(tax for _, _, tax in st.session_state["selected_items"]["Income Sources"])
+        total_deductions = sum(value for _, value in st.session_state["selected_items"]["Deductions"])
+        total_credits = sum(value for _, value in st.session_state["selected_items"]["Tax Credits"])
+        
+        taxable_income = total_income - total_deductions
+        final_tax = max(total_tax - total_credits, 0)  # Ensure tax doesn't go below zero
+        
+        st.markdown("### Tax Calculation Results")
+        st.write(f"**Total Income:** PKR {total_income}")
+        st.write(f"**Total Deductions:** PKR {total_deductions}")
+        st.write(f"**Taxable Income:** PKR {taxable_income}")
+        st.write(f"**Total Tax Credits:** PKR {total_credits}")
+        st.write(f"**Tax Payable:** PKR {final_tax}")
+        st.success("Tax payable calculation completed successfully!")
+
+# Main function
+def main():
+    set_styles()
+    st.markdown('<h1 class="header">🏦 TaxNova: Tax assessment app prototype</h1>', unsafe_allow_html=True)
+    st.write("This app calculates your taxes with a detailed breakdown of income sources, deductions, and tax credits.")
+
+    selected_main_category = st.selectbox("Select Main Category:", ["Income Sources", "Deductions", "Tax Credits"])
+
+    if selected_main_category == "Income Sources":
+        handle_income_sources()
+    elif selected_main_category == "Deductions":
+        handle_deductions()
+    elif selected_main_category == "Tax Credits":
+        handle_tax_credits()
+
+    display_selected_items()
+    calculate_tax_payable()  # Add here before reset calculations
+    reset_calculations()
+
+if __name__ == "__main__":
+    main()
