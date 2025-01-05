@@ -138,7 +138,6 @@ def handle_tax_credits():
                 st.session_state["selected_items"]["Tax Credits"].append((selection, value))
                 st.success(f"Tax credit {selection} added successfully.")
 
-# Display
 # Display selected items
 def display_selected_items():
     st.markdown('<h2 class="header">Selected Items Summary</h2>', unsafe_allow_html=True)
@@ -152,16 +151,15 @@ def display_selected_items():
     for item, value in st.session_state["selected_items"]["Tax Credits"]:
         st.markdown(f"<span class='highlight'>- {item}: PKR {value}</span>", unsafe_allow_html=True)
 
-# Final tax calculation
-def calculate_final_tax():
-    total_income = sum(value for _, value, _ in st.session_state["selected_items"]["Income Sources"])
-    total_deductions = sum(value for _, value in st.session_state["selected_items"]["Deductions"])
-    total_taxable_income = max(total_income - total_deductions, 0)
-    total_credits = sum(value for _, value in st.session_state["selected_items"]["Tax Credits"])
-    total_tax = sum(tax for _, _, tax in st.session_state["selected_items"]["Income Sources"])
-    final_tax_payable = max(total_tax - total_credits, 0)
-
-    return total_income, total_deductions, total_credits, total_taxable_income, final_tax_payable
+# Add reset logic
+def reset_calculations():
+    if st.button("🔄 Reset Calculations"):
+        st.session_state["selected_items"] = {
+            "Income Sources": [],
+            "Deductions": [],
+            "Tax Credits": []
+        }
+        st.success("All calculations have been reset.")
 
 # Main function
 def main():
@@ -179,15 +177,7 @@ def main():
         handle_tax_credits()
 
     display_selected_items()
-
-    if st.button("📊 Calculate Final Tax"):
-        total_income, total_deductions, total_credits, taxable_income, final_tax = calculate_final_tax()
-        st.markdown('<h2 class="header">Final Tax Calculation Summary</h2>', unsafe_allow_html=True)
-        st.write(f"**Total Income:** PKR {total_income}")
-        st.write(f"**Total Deductions:** PKR {total_deductions}")
-        st.write(f"**Total Taxable Income:** PKR {taxable_income}")
-        st.write(f"**Total Tax Credits:** PKR {total_credits}")
-        st.write(f"**Final Tax Payable:** PKR {final_tax}")
+    reset_calculations()
 
 if __name__ == "__main__":
     main()
