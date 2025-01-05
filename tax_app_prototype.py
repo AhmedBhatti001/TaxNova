@@ -22,63 +22,56 @@ def set_styles():
 def select_categories():
     st.markdown('<h2 class="header">Select Categories</h2>', unsafe_allow_html=True)
     income_categories = st.multiselect("Select Income Sources:", [
-        "Salary", "Bonuses", "Gratuity", "Business Income", "Property Income", "Capital Gains", "Other Income", "Foreign Income"
+        "Salary", "Bonuses", "Gratuity", "Leave Encashment", "Perquisites", "Benefits in Kind", 
+        "Sole Proprietorship Income", "Partnership Income", "Corporate Income", "Manufacturing Income", 
+        "Rental Income from Residential", "Rental Income from Commercial", "Gains on Real Estate", 
+        "Gains on Stocks", "Gains on Bonds", "Other Income", "Foreign Income"
     ])
     deduction_categories = st.multiselect("Select Deductions:", [
-        "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions", "Housing Loan Interest", "Business Deductions"
+        "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions", 
+        "Housing Loan Interest", "Depreciation", "Advertising Costs", "Employee Contributions", 
+        "Business-Specific Deductions"
     ])
     credit_categories = st.multiselect("Select Tax Credits:", [
-        "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment", "Pension Contributions"
+        "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment", 
+        "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs", 
+        "IT and Startups", "Green Investments", "Welfare Projects"
     ])
     return income_categories, deduction_categories, credit_categories
 
 def input_income(selected):
     st.markdown('<h3 class="header">Income Details</h3>', unsafe_allow_html=True)
     income_total = 0
-    if "Salary" in selected:
-        salary = st.number_input("Basic Salary (in PKR):", min_value=0, value=0, step=1000)
-        income_total += salary
-    if "Bonuses" in selected:
-        bonuses = st.number_input("Bonuses and Commissions (in PKR):", min_value=0, value=0, step=1000)
-        income_total += bonuses
-    if "Gratuity" in selected:
-        gratuity = st.number_input("Gratuity (in PKR):", min_value=0, value=0, step=1000)
-        income_total += gratuity
-    # Add similar inputs for other selected income categories
+    for category in selected:
+        value = st.number_input(f"Enter amount for {category} (in PKR):", min_value=0, value=0, step=1000)
+        income_total += value
     return income_total
 
 def input_deductions(selected):
     st.markdown('<h3 class="header">Deductions Details</h3>', unsafe_allow_html=True)
     deductions_total = 0
-    if "Charitable Donations" in selected:
-        donations = st.number_input("Charitable Donations (in PKR):", min_value=0, value=0, step=1000)
-        deductions_total += donations
-    if "Education Expenses" in selected:
-        education = st.number_input("Education Expenses (in PKR):", min_value=0, value=0, step=1000)
-        deductions_total += education
-    if "Medical Expenses" in selected:
-        medical = st.number_input("Medical Expenses (in PKR):", min_value=0, value=0, step=1000)
-        deductions_total += medical
-    # Add similar inputs for other selected deductions
+    for category in selected:
+        value = st.number_input(f"Enter amount for {category} (in PKR):", min_value=0, value=0, step=1000)
+        deductions_total += value
     return deductions_total
 
 def input_tax_credits(selected):
     st.markdown('<h3 class="header">Tax Credits Details</h3>', unsafe_allow_html=True)
     credits_total = 0
-    if "Investment in Housing" in selected:
-        housing = st.number_input("Investment in Housing (in PKR):", min_value=0, value=0, step=1000)
-        housing_credit = min(housing * 0.15, 2000000)  # 15% capped at PKR 2,000,000
-        credits_total += housing_credit
-    if "Foreign Taxes Paid" in selected:
-        foreign_taxes = st.number_input("Foreign Taxes Paid (in PKR):", min_value=0, value=0, step=1000)
-        foreign_income_tax = st.number_input("Foreign Income Taxable (in PKR):", min_value=0, value=0, step=1000)
-        foreign_credit = min(foreign_taxes, foreign_income_tax)
-        credits_total += foreign_credit
-    if "R&D Expenses" in selected:
-        rd_expenses = st.number_input("R&D Expenses (in PKR):", min_value=0, value=0, step=1000)
-        rd_credit = min(rd_expenses * 0.15, 50000)  # Example cap
-        credits_total += rd_credit
-    # Add similar inputs for other selected credits
+    for category in selected:
+        if category == "Investment in Housing":
+            investment = st.number_input("Investment in Housing (in PKR):", min_value=0, value=0, step=1000)
+            credit = min(investment * 0.15, 2000000)  # 15% capped at PKR 2,000,000
+        elif category == "Foreign Taxes Paid":
+            foreign_taxes = st.number_input("Foreign Taxes Paid (in PKR):", min_value=0, value=0, step=1000)
+            foreign_income_tax = st.number_input("Foreign Income Taxable (in PKR):", min_value=0, value=0, step=1000)
+            credit = min(foreign_taxes, foreign_income_tax)
+        elif category == "R&D Expenses":
+            rd_expenses = st.number_input("R&D Expenses (in PKR):", min_value=0, value=0, step=1000)
+            credit = min(rd_expenses * 0.15, 50000)  # Example cap
+        else:
+            credit = st.number_input(f"Enter credit for {category} (in PKR):", min_value=0, value=0, step=1000)
+        credits_total += credit
     return credits_total
 
 def calculate_summary(income, deductions, credits):
