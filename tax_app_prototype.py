@@ -177,28 +177,9 @@ def reset_calculations():
             "Tax Credits": []
         }
         st.success("All calculations have been reset.")
+        st.experimental_rerun()
 
-# Main function
-def main():
-    set_styles()
-    st.markdown('<h1 class="header">🏦 TaxNova: Tax assessment app prototype</h1>', unsafe_allow_html=True)
-    st.write("This app calculates your taxes with a detailed breakdown of income sources, deductions, and tax credits.")
-
-    selected_main_category = st.selectbox("Select Main Category:", ["Income Sources", "Deductions", "Tax Credits"])
-
-    if selected_main_category == "Income Sources":
-        handle_income_sources()
-    elif selected_main_category == "Deductions":
-        handle_deductions()
-    elif selected_main_category == "Tax Credits":
-        handle_tax_credits()
-
-    display_selected_items()
-    reset_calculations()
-
-if __name__ == "__main__":
-    main()
-  # Add calculate tax payable logic
+# Add calculate tax payable logic
 def calculate_tax_payable():
     if st.button("✅ Calculate Tax Payable", key="calculate_tax"):
         total_income = sum(value for _, value, _ in st.session_state["selected_items"]["Income Sources"])
@@ -233,7 +214,7 @@ def main():
         handle_tax_credits()
 
     display_selected_items()
-    calculate_tax_payable()  # Add here before reset calculations
+    calculate_tax_payable()
     reset_calculations()
 
 if __name__ == "__main__":
