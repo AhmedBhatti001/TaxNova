@@ -140,4 +140,25 @@ if st.button("📊 Calculate Tax"):
     # Display Results
     st.success(f"Your total income: PKR {total_income}")
     st.success(f"Your total deductions: PKR {total_deductions}")
-    st.success(f"Your taxable income after deductions: PKR {tax
+    st.success(f"Your taxable income after deductions: PKR {taxable_income}")
+    st.success(f"Your total tax credits: PKR {total_credits}")
+    st.success(f"Your estimated tax payable: PKR {tax_payable_after_credits}")
+
+    # Visualize Tax Breakdown
+    breakdown_data = {
+        "Total Income": total_income,
+        "Deductions": total_deductions,
+        "Taxable Income After Deductions": taxable_income,
+        "Tax Credits": total_credits,
+        "Tax Payable": tax_payable_after_credits
+    }
+
+    fig, ax = plt.subplots()
+    ax.bar(breakdown_data.keys(), breakdown_data.values(), color="#4CAF50")
+    ax.set_title("Tax Breakdown")
+    ax.set_ylabel("Amount (PKR)")
+    st.pyplot(fig)
+
+# Feedback Section
+st.header("📝 Feedback")
+feedback = st.text_area("Is anything missing or needed to calculate? Provide your feedback below:")
