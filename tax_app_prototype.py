@@ -20,83 +20,72 @@ def set_styles():
         unsafe_allow_html=True
     )
 
-# Dropdown for categories and subcategories
-def select_categories():
+# Dropdown for hierarchical selection
+def hierarchical_menu():
     st.markdown('<h2 class="header">Select Categories</h2>', unsafe_allow_html=True)
-    income_categories = st.multiselect("Select Income Sources:", [
-        "Salary", "Bonuses and Commissions", "Gratuity", "Leave Encashment", "Perquisites", "Benefits in Kind",
-        "Sole Proprietorship Income", "Partnership Income", "Corporate Business Income", "Profits from Manufacturing",
-        "Rental Income from Residential", "Rental Income from Commercial", "Gains on Real Estate", "Gains on Stocks",
-        "Interest Income", "Dividend Income", "Royalty Income", "Prize Money", "Foreign Income"
+
+    selected_main_category = st.selectbox("Select Main Category:", [
+        "Income Sources", "Deductions", "Tax Credits"
     ])
-    deduction_categories = st.multiselect("Select Deductions:", [
-        "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions",
-        "Housing Loan Interest", "Depreciation", "Employee Contributions", "Business-Specific Deductions"
-    ])
-    credit_categories = st.multiselect("Select Tax Credits:", [
-        "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment",
-        "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
-        "IT and Startups", "Green Investments", "Welfare Projects"
-    ])
-    return income_categories, deduction_categories, credit_categories
 
-# Input for income sources
-def input_income(selected):
-    st.markdown('<h3 class="header">Income Details</h3>', unsafe_allow_html=True)
-    income_total = 0
-    for category in selected:
-        value = st.number_input(f"Enter amount for {category} (in PKR):", min_value=0, value=0, step=1000)
-        income_total += value
-    if st.checkbox("Add Custom Income Source"):
-        custom_name = st.text_input("Custom Income Source Name:")
-        custom_amount = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-        income_total += custom_amount
-    return income_total
+    if selected_main_category == "Income Sources":
+        income_main_categories = st.selectbox("Select Income Type:", [
+            "Salary", "Income from Business", "Income from Property", "Capital Gains", 
+            "Income from Other Sources", "Foreign Income"
+        ])
+        if income_main_categories == "Salary":
+            selected_salary = st.multiselect("Select Salary Components:", [
+                "Basic Salary", "Bonuses", "Gratuity", "Leave Encashment", "Perquisites", "Benefits in Kind"
+            ])
+            return "Income Sources", income_main_categories, selected_salary
 
-# Input for deductions
-def input_deductions(selected):
-    st.markdown('<h3 class="header">Deductions Details</h3>', unsafe_allow_html=True)
-    deductions_total = 0
-    for category in selected:
-        value = st.number_input(f"Enter amount for {category} (in PKR):", min_value=0, value=0, step=1000)
-        deductions_total += value
-    if st.checkbox("Add Custom Deduction"):
-        custom_name = st.text_input("Custom Deduction Name:")
-        custom_amount = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-        deductions_total += custom_amount
-    return deductions_total
+        elif income_main_categories == "Income from Business":
+            selected_business = st.multiselect("Select Business Income Type:", [
+                "Sole Proprietorship Income", "Partnership Income", "Corporate Business Income", 
+                "Profits from Manufacturing"
+            ])
+            return "Income Sources", income_main_categories, selected_business
 
-# Input for tax credits
-def input_tax_credits(selected):
-    st.markdown('<h3 class="header">Tax Credits Details</h3>', unsafe_allow_html=True)
-    credits_total = 0
-    for category in selected:
-        if category == "Investment in Housing":
-            investment = st.number_input("Investment in Housing (in PKR):", min_value=0, value=0, step=1000)
-            credit = min(investment * 0.15, 2000000)  # 15% capped at PKR 2,000,000
-        elif category == "Foreign Taxes Paid":
-            foreign_taxes = st.number_input("Foreign Taxes Paid (in PKR):", min_value=0, value=0, step=1000)
-            foreign_income_tax = st.number_input("Foreign Income Taxable (in PKR):", min_value=0, value=0, step=1000)
-            credit = min(foreign_taxes, foreign_income_tax)
-        elif category == "R&D Expenses":
-            rd_expenses = st.number_input("R&D Expenses (in PKR):", min_value=0, value=0, step=1000)
-            credit = min(rd_expenses * 0.15, 50000)  # Example cap
-        else:
-            credit = st.number_input(f"Enter credit for {category} (in PKR):", min_value=0, value=0, step=1000)
-        credits_total += credit
-    if st.checkbox("Add Custom Tax Credit"):
-        custom_name = st.text_input("Custom Tax Credit Name:")
-        custom_amount = st.number_input(f"Enter amount for {custom_name} (in PKR):", min_value=0, value=0, step=1000)
-        credits_total += custom_amount
-    return credits_total
+        elif income_main_categories == "Income from Property":
+            selected_property = st.multiselect("Select Property Income Type:", [
+                "Rental Income from Residential Properties", "Rental Income from Commercial Properties", 
+                "Leasing Income", "Subletting Income"
+            ])
+            return "Income Sources", income_main_categories, selected_property
 
-# Calculate taxable income and tax
+        elif income_main_categories == "Capital Gains":
+            selected_gains = st.multiselect("Select Capital Gains Type:", [
+                "Gains on Sale of Real Estate", "Gains on Sale of Stocks", "Gains on Sale of Bonds"
+            ])
+            return "Income Sources", income_main_categories, selected_gains
 
-def calculate_summary(income, deductions, credits):
-    taxable_income = max(income - deductions, 0)
-    tax_payable_before_credits = taxable_income * 0.10  # Example flat tax rate
-    tax_payable_after_credits = max(tax_payable_before_credits - credits, 0)
-    return taxable_income, tax_payable_after_credits
+        elif income_main_categories == "Income from Other Sources":
+            selected_others = st.multiselect("Select Other Income Type:", [
+                "Interest Income", "Dividend Income", "Royalty Income", "Prize Money"
+            ])
+            return "Income Sources", income_main_categories, selected_others
+
+        elif income_main_categories == "Foreign Income":
+            selected_foreign = st.multiselect("Select Foreign Income Type:", [
+                "Salaries Earned Abroad", "Business Income from Foreign Operations", 
+                "Dividends and Interest Earned Overseas", "Foreign Rental Income"
+            ])
+            return "Income Sources", income_main_categories, selected_foreign
+
+    elif selected_main_category == "Deductions":
+        selected_deduction = st.multiselect("Select Deductions:", [
+            "Charitable Donations", "Education Expenses", "Medical Expenses", "Zakat Contributions",
+            "Housing Loan Interest", "Depreciation", "Advertising Costs", "Employee Contributions"
+        ])
+        return "Deductions", None, selected_deduction
+
+    elif selected_main_category == "Tax Credits":
+        selected_credit = st.multiselect("Select Tax Credits:", [
+            "Investment in Housing", "Foreign Taxes Paid", "R&D Expenses", "Renewable Energy Investment",
+            "Pension Contributions", "Education Loans", "Disabled Persons", "Women Entrepreneurs",
+            "IT and Startups", "Green Investments", "Welfare Projects"
+        ])
+        return "Tax Credits", None, selected_credit
 
 # Main function
 def main():
@@ -104,35 +93,25 @@ def main():
     st.markdown('<h1 class="header">🏦 TaxNova: Comprehensive Tax App</h1>', unsafe_allow_html=True)
     st.write("This app calculates your taxes with a detailed breakdown of income sources, deductions, and tax credits.")
 
-    income_categories, deduction_categories, credit_categories = select_categories()
+    category, subcategory, selections = hierarchical_menu()
 
-    st.markdown('<h2 class="header">Selected Categories</h2>', unsafe_allow_html=True)
-    st.write(f"### Income Sources: {income_categories}")
-    st.write(f"### Deductions: {deduction_categories}")
-    st.write(f"### Tax Credits: {credit_categories}")
+    if category == "Income Sources" and selections:
+        st.markdown(f'<h3 class="header">Selected Income Source: {subcategory}</h3>', unsafe_allow_html=True)
+        for selection in selections:
+            value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000)
 
-    income_total = input_income(income_categories)
-    deductions_total = input_deductions(deduction_categories)
-    credits_total = input_tax_credits(credit_categories)
+    elif category == "Deductions" and selections:
+        st.markdown('<h3 class="header">Selected Deductions</h3>', unsafe_allow_html=True)
+        for selection in selections:
+            value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000)
+
+    elif category == "Tax Credits" and selections:
+        st.markdown('<h3 class="header">Selected Tax Credits</h3>', unsafe_allow_html=True)
+        for selection in selections:
+            value = st.number_input(f"Enter amount for {selection} (in PKR):", min_value=0, value=0, step=1000)
 
     if st.button("📊 Calculate Tax"):
-        taxable_income, tax_payable = calculate_summary(income_total, deductions_total, credits_total)
-        st.success(f"Your taxable income: PKR {taxable_income}")
-        st.success(f"Your estimated tax payable: PKR {tax_payable}")
-
-        breakdown_data = {
-            "Total Income": income_total,
-            "Deductions": deductions_total,
-            "Taxable Income": taxable_income,
-            "Tax Credits": credits_total,
-            "Tax Payable": tax_payable
-        }
-
-        fig, ax = plt.subplots()
-        ax.bar(breakdown_data.keys(), breakdown_data.values(), color="#4CAF50")
-        ax.set_title("Tax Breakdown")
-        ax.set_ylabel("Amount (PKR)")
-        st.pyplot(fig)
+        st.success("Tax calculation logic to be implemented.")
 
 if __name__ == "__main__":
     main()
